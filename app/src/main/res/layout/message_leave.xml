@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutSalida"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <TextView
+        android:id="@+id/headingLeave"
+        android:text="Fecha - Hora"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"/>
+
+    <TextView
+        android:id="@+id/messageBodyLeave"
+        android:background="@drawable/bg_messsage_leave"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Su hijo salio de la institución"
+        android:layout_centerHorizontal="true"
+        android:textSize="8pt"
+        android:drawableRight="@drawable/ic_arrow_downward_black_24dp"
+        android:paddingBottom="14dp"
+        android:paddingRight="10dp"
+        android:textColor="#FFF"
+        android:shadowColor="#024368"
+        android:shadowRadius="10"
+        android:drawablePadding="10dp"
+        android:textStyle="bold"
+        android:paddingTop="20dp"
+        android:paddingLeft="10dp"
+        android:layout_margin="15dp"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/headingLeave"/>
+
+
+</RelativeLayout>
