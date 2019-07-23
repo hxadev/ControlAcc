@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,29 +39,22 @@ import static android.content.Intent.getIntent;
 
 public class SessionFragment extends Fragment implements Response.Listener<JSONObject>,Response.ErrorListener {
 
-
     private RequestQueue rq;
     private JsonRequest jrq;
 
     private TextView schoolName;
-
     private EditText boxUser,boxPass;
     private Button btnLogin,btnEscuela;
     private User user;
     private Escuela escuela;
-
     private Intent in;
     private String ipServidorEscuela;
-
     private JSONObject jsonObject;
-
     public SharedPreferences sp;
-
     public static final String NAMESTUDENT="nameStudent";
     public static final String USER="user";
     public static final String PASSWORD="password";
-
-
+    private static final String TAG=MainActivity.class.getSimpleName();
 
 
     @Override
@@ -70,7 +64,7 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
 
         sp=this.getActivity().getSharedPreferences(ConfigSchoolActivity.MyPREFERENCES, Context.MODE_PRIVATE);
 
-        System.out.println("*************************** "+sp.getAll());
+        Log.e(TAG,""+sp.getAll());
 
         user=new User();
         escuela=new Escuela();
@@ -91,7 +85,7 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
 
         final String getSchoolName="Escuela "+in.getExtras().getString("nombre");
         ipServidorEscuela=in.getExtras().getString("ipServidorEscuela");
-        //System.out.println("******* >>>"+ipServidorEscuela);
+
 
 
         schoolName.setText(getSchoolName);
@@ -128,9 +122,6 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
     }
 
 
-    public void viewSharedPreferences(){
-
-    }
 
     @Override
     public void onErrorResponse(VolleyError error) {
@@ -149,26 +140,28 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
                 dialogSuccess.setTitleText("Usuario no encontrado")
                         .setContentText("Presiona el boton para continuar")
                         .show();
+                Log.e(TAG,"Usuario No encontrado");
             }
         }.start();
 
 
 
-        System.out.println("Error "+error.getStackTrace());
-        System.out.println(error.networkResponse);
-        System.out.println(error.getMessage());
-        error.printStackTrace();
+        Log.e(TAG,"Error "+error.getStackTrace());
+        Log.e(TAG, String.valueOf(error.networkResponse));
+        Log.e(TAG, String.valueOf(error.getMessage()));
+
     }
 
     @Override
     public void onResponse(final JSONObject response) {
 
+        Log.e(TAG,"************************************************");
+        Log.e(TAG,"********* RESPUESTA DEL SERVICIO WEB ***********");
+        Log.e(TAG,"************************************************");
 
         final JSONArray jsonarray=response.optJSONArray("datos");
 
         SharedPreferences.Editor editor=sp.edit();
-
-
         jsonObject=null;
 
 

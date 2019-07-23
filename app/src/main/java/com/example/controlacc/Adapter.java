@@ -11,6 +11,10 @@ import com.example.controlacc.model.MessagesData;
 
 import java.util.ArrayList;
 
+/**
+ * Clase adaptadora que hereda de RecyclerView la cual permite
+ * agregar mensajes a la pantalla principal
+ */
 public class Adapter extends RecyclerView.Adapter<Adapter.Holder> {
 
     private ArrayList<MessagesData> mMessagesData;

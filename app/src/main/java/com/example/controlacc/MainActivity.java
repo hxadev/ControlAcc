@@ -35,11 +35,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import org.apache.logging.log4j.*;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
+
 public class MainActivity extends AppCompatActivity {
+
 
     private RecyclerView mRecyclerView;
     private Adapter mAdapter;
@@ -53,13 +56,15 @@ public class MainActivity extends AppCompatActivity {
     public String passwd;
     public String server;
 
-
-
-
     SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Log.e(TAG,"***************************************************************");
+        Log.e(TAG,"**************** INICIANDO LA APLICACIÖN CLIENTE **************");
+        Log.e(TAG,"***************************************************************");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -82,10 +87,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
         sp=getSharedPreferences(ConfigSchoolActivity.MyPREFERENCES, Context.MODE_PRIVATE);
-
+        Log.e(TAG,"Almacenado el Shared Preferences "+sp.toString());
 
         //System.out.println(">>>>> "+sp.getAll().get("nameStudent"));
 
@@ -106,14 +109,16 @@ public class MainActivity extends AppCompatActivity {
         //System.out.println("user: "+usr+"\npass: "+passwd+"\nServer: "+server);
 
         setConnection();
-
+        Log.e(TAG,"Conexion Establecida");
     }
 
 
+    /**
+     *
+     */
     private void setConnection(){
-
-        System.out.println("user: "+usr+"\npass: "+passwd+"\nServer: "+server);
-
+        Log.e(TAG,"user: "+usr+"\npass: "+passwd+"\nServer: "+server);
+        Log.e(TAG,"Iniciando Conexion...");
         new Thread(){
 
             @Override
@@ -127,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                System.out.println("**** Addr ***** " +addr);
+                Log.e(TAG,"**** Addr ***** " +addr);
 
                 HostnameVerifier verifier=new HostnameVerifier() {
                     @Override
@@ -136,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 };
 
-                System.out.println("**** HOST VERIFIER *****");
+               Log.e(TAG,"**** HOST VERIFIER *****");
 
 
                 DomainBareJid serviceName=null;
@@ -148,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
 
-                System.out.println("**** SERVICE NAME ***** "+serviceName);
+                Log.e(TAG,"**** SERVICE NAME ***** "+serviceName);
 
                 XMPPTCPConnectionConfiguration config=XMPPTCPConnectionConfiguration
                         .builder()
@@ -160,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                         .setHostAddress(addr)
                         .build();
 
-                System.out.println("**** CONFIG XMPP *****" + config.getUsername()+" - "+config.getPassword());
+                Log.e(TAG,"**** CONFIG XMPP *****" + config.getUsername()+" - "+config.getPassword());
 
                 mConnection=new XMPPTCPConnection(config);
 
@@ -168,11 +173,12 @@ public class MainActivity extends AppCompatActivity {
                     mConnection.connect();
                     mConnection.login();
 
-                    System.out.println("**** CONNECTION XMPP *****");
+                    Log.e(TAG,"**** CONNECTION XMPP *****");
 
                     if(mConnection.isAuthenticated() && mConnection.isConnected()){
 
-                        Log.e(TAG,"Login Success");
+                        Log.e(TAG,"Conexion XMPP Autenticada");
+                        Log.e(TAG,"Usuario "+usr);
 
                         ChatManager chatManager=ChatManager.getInstanceFor(mConnection);
                         chatManager.addIncomingListener(new IncomingChatMessageListener() {
@@ -199,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                         });
 
                     }else{
-                        System.out.println("Conexion Fallida");
+                        Log.e(TAG,"Fallo La Conexión");
                     }
 
 
@@ -207,12 +213,16 @@ public class MainActivity extends AppCompatActivity {
 
                 } catch (SmackException e) {
                     e.printStackTrace();
+                    Log.e(TAG,e.getMessage());
                 } catch (IOException e) {
                     e.printStackTrace();
+                    Log.e(TAG,e.getMessage());
                 } catch (XMPPException e) {
                     e.printStackTrace();
+                    Log.e(TAG,e.getMessage());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    Log.e(TAG,e.getMessage());
                 }
 
 
