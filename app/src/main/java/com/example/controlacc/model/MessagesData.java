@@ -1,5 +1,8 @@
 package com.example.controlacc.model;
 
+/**
+ * @author Alfonso Hernandez Xochipa
+ */
 public class MessagesData {
 
     private String heading,messages;

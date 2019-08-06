@@ -14,6 +14,8 @@ import java.util.ArrayList;
 /**
  * Clase adaptadora que hereda de RecyclerView la cual permite
  * agregar mensajes a la pantalla principal
+ *
+ * @author Alfonso Hernandez Xochipa
  */
 public class Adapter extends RecyclerView.Adapter<Adapter.Holder> {
 
@@ -32,11 +34,9 @@ public class Adapter extends RecyclerView.Adapter<Adapter.Holder> {
 
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int i) {
-
         MessagesData data=mMessagesData.get(i);
         holder.heading.setText(data.getHeading());
         holder.messages.setText(data.getMessages());
-
 
     }
 

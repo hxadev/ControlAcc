@@ -13,7 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -37,6 +39,10 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 import static android.content.Intent.getIntent;
 
 
+/**
+ *
+ * @author Alfonso Hernández Xochipa
+ */
 public class SessionFragment extends Fragment implements Response.Listener<JSONObject>,Response.ErrorListener {
 
     private RequestQueue rq;
@@ -45,10 +51,12 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
     private TextView schoolName;
     private EditText boxUser,boxPass;
     private Button btnLogin,btnEscuela;
+    private Switch switchRememberSession;
     private User user;
     private Escuela escuela;
     private Intent in;
     private String ipServidorEscuela;
+    private Boolean isCheckedSwitch;
     private JSONObject jsonObject;
     public SharedPreferences sp;
     public static final String NAMESTUDENT="nameStudent";
@@ -57,14 +65,22 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
     private static final String TAG=MainActivity.class.getSimpleName();
 
 
+    /**
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
         sp=this.getActivity().getSharedPreferences(ConfigSchoolActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+        rq= Volley.newRequestQueue(getContext());
+        in=getActivity().getIntent();
 
-        Log.e(TAG,""+sp.getAll());
+        Log.i(TAG,""+sp.getAll());
 
         user=new User();
         escuela=new Escuela();
@@ -73,21 +89,21 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
 
         boxUser=(TextInputEditText)view.findViewById(R.id.user);
         boxPass=(TextInputEditText)view.findViewById(R.id.password);
-        btnLogin=(Button)view.findViewById(R.id.btnLogin);
-        btnEscuela=(Button)view.findViewById(R.id.btnEscuela);
-        schoolName=(TextView)view.findViewById(R.id.schoolName);
+        btnLogin= view.findViewById(R.id.btnLogin);
+        btnEscuela= view.findViewById(R.id.btnEscuela);
+        schoolName= view.findViewById(R.id.schoolName);
+        switchRememberSession=view.findViewById(R.id.switchRememberSession);
 
+        switchRememberSession.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                isCheckedSwitch=isChecked?true:false;
 
-        rq= Volley.newRequestQueue(getContext());
-
-
-        in=getActivity().getIntent();
+            }
+        });
 
         final String getSchoolName="Escuela "+in.getExtras().getString("nombre");
         ipServidorEscuela=in.getExtras().getString("ipServidorEscuela");
-
-
-
         schoolName.setText(getSchoolName);
 
         btnLogin.setOnClickListener(new View.OnClickListener(){
@@ -96,6 +112,7 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
             public void onClick(View v) {
                 loginSession();
             }
+
         });
         btnEscuela.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,13 +121,7 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
                 dialogSchool.setTitle("Informacion de la escuela");
                 dialogSchool.setContentText("Nombre: "+getSchoolName);
 
-                if(in.getExtras().getInt("nivelEducativo")==1){
-                    dialogSchool.setContentText("Nivel: Primaria");
-                }else if(in.getExtras().getInt("nivelEducativo")==2){
-                    dialogSchool.setContentText("Nivel: Secundaria");
-                }else if(in.getExtras().getInt("nivelEducativo")==3){
-                    dialogSchool.setContentText("Nivel: Bachillerato");
-                }
+                    dialogSchool.setContentText("Nivel: " + getTypeSchool(in));
 
                 dialogSchool.show();
             }
@@ -122,7 +133,10 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
     }
 
 
-
+    /**
+     *
+     * @param error
+     */
     @Override
     public void onErrorResponse(VolleyError error) {
 
@@ -152,6 +166,10 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
 
     }
 
+    /**
+     *
+     * @param response
+     */
     @Override
     public void onResponse(final JSONObject response) {
 
@@ -201,9 +219,9 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
 
     }
 
-
-
-
+    /**
+     *
+     */
     private void loginSession(){
 
         int i=-1;
@@ -240,5 +258,20 @@ public class SessionFragment extends Fragment implements Response.Listener<JSONO
         rq.add(jrq);
 
 
+    }
+
+    public String getTypeSchool(Intent in){
+
+        String schoolType="";
+
+        if(in.getExtras().getInt("nivelEducativo")==1){
+            schoolType="Primaria";
+        }else if(in.getExtras().getInt("nivelEducativo")==2){
+            schoolType="Secundaria";
+        }else if(in.getExtras().getInt("nivelEducativo")==3){
+            schoolType="Bachillerato";
+        }
+
+        return schoolType;
     }
 }

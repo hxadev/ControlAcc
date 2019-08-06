@@ -1,15 +1,24 @@
 package com.example.controlacc.model;
 
+/**
+ * @author Alfonso Hernandez Xochipa
+ */
 public class User {
 
     private String userApp;
     private String passApp;
 
 
-    public User(){
+    public User() {
         ;
     }
 
+
+    /**
+     *
+     * @param userApp
+     * @param passApp
+     */
     public User(String userApp,String passApp){
         this.userApp=userApp;
         this.passApp=passApp;

@@ -1,7 +1,14 @@
 package com.example.controlacc;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -9,41 +16,29 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-
-import com.example.controlacc.model.Escuela;
-import com.example.controlacc.model.MessagesData;
-import com.example.controlacc.model.User;
-
-import org.jivesoftware.smack.AbstractXMPPConnection;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.chat2.Chat;
-import org.jivesoftware.smack.chat2.ChatManager;
-import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
+import com.example.controlacc.model.*;
+import org.jivesoftware.smack.*;
+import org.jivesoftware.smack.chat2.*;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.tcp.XMPPTCPConnection;
-import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
-import org.jxmpp.jid.DomainBareJid;
-import org.jxmpp.jid.EntityBareJid;
+import org.jivesoftware.smack.tcp.*;
+import org.jxmpp.jid.*;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-import org.apache.logging.log4j.*;
+import java.util.*;
+
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
 
+/**
+ *@author Alfonso Hernandez Xochipa
+ */
 public class MainActivity extends AppCompatActivity {
-
-
     private RecyclerView mRecyclerView;
     private Adapter mAdapter;
     private ArrayList<MessagesData> mMessageData=new ArrayList<>();
@@ -58,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
 
     SharedPreferences sp;
 
+    /**
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -78,20 +77,14 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.setAdapter(mAdapter);
 
-
         Toolbar toolbar=(Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Bienvenido");
         toolbar.setSubtitle("Padre de Familia");
         toolbar.setLogo(R.drawable.ic_school_black_24dp);
 
-
-
         sp=getSharedPreferences(ConfigSchoolActivity.MyPREFERENCES, Context.MODE_PRIVATE);
         Log.e(TAG,"Almacenado el Shared Preferences "+sp.toString());
-
-        //System.out.println(">>>>> "+sp.getAll().get("nameStudent"));
-
 
         user=new User();
         Escuela escuela=new Escuela();
@@ -109,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         //System.out.println("user: "+usr+"\npass: "+passwd+"\nServer: "+server);
 
         setConnection();
-        Log.e(TAG,"Conexion Establecida");
+        Log.i(TAG,"Conexion Establecida");
     }
 
 
@@ -117,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
      *
      */
     private void setConnection(){
-        Log.e(TAG,"user: "+usr+"\npass: "+passwd+"\nServer: "+server);
-        Log.e(TAG,"Iniciando Conexion...");
+        Log.i(TAG,"user: "+usr+"\npass: "+passwd+"\nServer: "+server);
+        Log.i(TAG,"Iniciando Conexion...");
         new Thread(){
 
             @Override
@@ -132,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                Log.e(TAG,"**** Addr ***** " +addr);
+                Log.i(TAG,"**** Addr ***** " +addr);
 
                 HostnameVerifier verifier=new HostnameVerifier() {
                     @Override
@@ -141,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 };
 
-               Log.e(TAG,"**** HOST VERIFIER *****");
+               Log.i(TAG,"**** HOST VERIFIER *****");
 
 
                 DomainBareJid serviceName=null;
@@ -153,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
 
-                Log.e(TAG,"**** SERVICE NAME ***** "+serviceName);
+                Log.i(TAG,"**** SERVICE NAME ***** "+serviceName);
 
                 XMPPTCPConnectionConfiguration config=XMPPTCPConnectionConfiguration
                         .builder()
@@ -165,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                         .setHostAddress(addr)
                         .build();
 
-                Log.e(TAG,"**** CONFIG XMPP *****" + config.getUsername()+" - "+config.getPassword());
+                Log.i(TAG,"**** CONFIG XMPP *****" + config.getUsername()+" - "+config.getPassword());
 
                 mConnection=new XMPPTCPConnection(config);
 
@@ -173,27 +166,59 @@ public class MainActivity extends AppCompatActivity {
                     mConnection.connect();
                     mConnection.login();
 
-                    Log.e(TAG,"**** CONNECTION XMPP *****");
+                    Log.i(TAG,"**** CONNECTION XMPP *****");
 
                     if(mConnection.isAuthenticated() && mConnection.isConnected()){
 
-                        Log.e(TAG,"Conexion XMPP Autenticada");
-                        Log.e(TAG,"Usuario "+usr);
+                        Log.i(TAG,"Conexion XMPP Autenticada");
+                        Log.i(TAG,"Usuario "+usr);
 
                         ChatManager chatManager=ChatManager.getInstanceFor(mConnection);
                         chatManager.addIncomingListener(new IncomingChatMessageListener() {
                             @Override
                             public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-                                Log.e(TAG,"Nuevo mensaje de "+from+": "+message.getBody());
 
+                                /*********************************************
+                                 * Creando las notificaciones en tiempo real *
+                                 *********************************************/
+                                Log.i(TAG,"¡New Notification! Preparing to send...");
+                                NotificationCompat.Builder notificationBuilder;
+                                NotificationManager notificatoinManager=(NotificationManager) getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
 
-                                SimpleDateFormat dateFormat=new SimpleDateFormat("dd-MMMM-yyyy",new Locale("es_ES"));
+                                int iconNotification=R.mipmap.ic_launcher;
+                                Intent intentNotification=new Intent(MainActivity.this,MainActivity.class);
+                                PendingIntent pendingIntent=PendingIntent.getActivity(MainActivity.this,0,intentNotification,0);
+
+                                /*********************************************
+                                 * Iniciando la Configurando la notificacion *
+                                 *********************************************/
+                                Uri soundNotification= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                                notificationBuilder=new NotificationCompat.Builder(getApplicationContext())
+                                        .setContentIntent(pendingIntent)
+                                        .setSmallIcon(iconNotification)
+                                        .setContentTitle("Nuevo Mensaje")
+                                        .setContentText(message.getBody())
+                                        .setVibrate(new long[]{100,250,100,100})
+                                        .setSound(soundNotification)
+                                        .setAutoCancel(true);
+
+                                /****************************
+                                 * Lanzando la Notificación *
+                                 ****************************/
+                                notificatoinManager.notify(1,notificationBuilder.build());
+                                Log.i(TAG,"Show Notification Succesfully!");
+
+                                SimpleDateFormat dateFormat=new SimpleDateFormat("yyyyMMdd_HHmmss",new Locale("es_ES"));
                                 Date date=new Date();
                                 String fecha=dateFormat.format(date);
 
+                                Log.i(TAG,"Nuevo mensaje de "+from+": "+message.getBody()+" : "+fecha);
+
+                                /**************************************************
+                                 * Añadiendo el Mensaje recibido al recycler view *
+                                 **************************************************/
                                 MessagesData data=new MessagesData("Recibido "+fecha,""+message.getBody().toString());
                                 mMessageData.add(data);
-
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -208,9 +233,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(TAG,"Fallo La Conexión");
                     }
 
-
-
-
                 } catch (SmackException e) {
                     e.printStackTrace();
                     Log.e(TAG,e.getMessage());
@@ -224,7 +246,6 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                     Log.e(TAG,e.getMessage());
                 }
-
 
             }
         }.start();
